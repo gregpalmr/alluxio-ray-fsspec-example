@@ -1,6 +1,6 @@
 # alluxio-ray-fsspec-example
 
-### A demonstration of Alluxio Enterprise 3.x serving data using the Filesystem Spec (fsspec) for Python to a Ray cluster.
+### A demonstration of Alluxio Enterprise 3.x serving data using the Filesystem Spec (fsspec) for Python on a Ray cluster.
 
 ## INTRODUCTION
 
@@ -32,7 +32,9 @@ Ray utilizes PyArrow to load and convert data formats into Arrow format, which w
 
 ![alt Alluxio Enterprise with Ray ](images/alluxio-with-ray-diagram.png?raw=true)
 
-This git repo provides a working environment where Alluxio Enterprise 3.x with its fsspec implementation allows Python based workloads running on Ray to access model training data much more efficiently.
+This git repo provides an example environment where Alluxio Enterprise 3.x with its fsspec implementation allows Python based workloads running on Ray to access model training data much more efficiently.
+
+NOTE: This git repo environment is for educational purposes only and should not be use for any kind of real or production deployments.
 
 ### Alluxio Enterprise fsspec implementation
 
@@ -255,7 +257,7 @@ RUN if [ ! -d /usr/lib/jvm/jre-11-openjdk ]; then \
 #
 # Install Alluxio Enterprise
 #
-# NOTE: You must first download the Alluxi Enterprise tar.gz file
+# NOTE: You must first download the Alluxio Enterprise tar.gz file
 #       and place it in the ./local-files directory
 
 # Create an alluxio user (to run the Alluxio daemons)
@@ -313,7 +315,7 @@ If you are using DockerHub as your docker registry, Use the "docker push" comman
 
 ### Step 6. Launch the docker containers with Docker Compose
 
-In this simple non-prod deployment, we will be using the Docker Compose utility to launch Alluxio Enterprise 3.x with newly built Alluxio Docker image. Later, if you intend to launch Alluxio Enterprise Docker image on a Kubernetes cluster, then you would follow the instructions provided Alluxio here:
+In this simple non-prod deployment, we will be using the Docker Compose utility to launch Alluxio Enterprise 3.x with the newly built Alluxio Docker image. Later, if you intend to launch the Alluxio Enterprise Docker image on a Kubernetes cluster, then you would follow the instructions provided Alluxio here:
 
      https://docs.alluxio.io/ee-ai/user/stable/en/kubernetes/Install-Alluxio-On-Kubernetes.html
 
