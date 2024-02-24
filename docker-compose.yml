@@ -1,0 +1,240 @@
+version: '3.7' 
+
+services:
+
+  etcd-1:
+    image: quay.io/coreos/etcd:v3.5.0
+    hostname: etcd-1
+    container_name: etcd-1-qvn
+    networks:
+      custom:
+        ipv4_address: 178.26.0.10
+    expose:
+      - 2379
+    ports:
+      - 2380:2380
+      - 4001:4001
+    volumes:
+      - etcd-1-data:/tmp/etcd_data
+    command:
+      - etcd
+      - --name=etcd-1
+      - --data-dir=/tmp/etcd_data
+      - --advertise-client-urls=http://etcd-1:2379
+      - --listen-client-urls=http://0.0.0.0:2379
+      - --initial-advertise-peer-urls=http://etcd-1:2380
+      - --listen-peer-urls=http://0.0.0.0:2380
+      - --initial-cluster=etcd-1=http://etcd-1:2380
+      - --initial-cluster-state=new
+      - --initial-cluster-token=etcd-cluster-1
+
+
+  alluxio-master-1:
+    user: root
+    image: myalluxio/alluxio-enterprise:3.2.0-beta
+    hostname: alluxio-master-1
+    container_name: alluxio-master-1-qvn
+    networks:
+      custom:
+        ipv4_address: 178.26.0.11
+    depends_on:
+      - minio-create-buckets
+      - etcd-1
+    volumes:
+      - alluxio-master-1-metastore-data:/opt/alluxio/metastore
+      - ./config-files:/tmp/config-files:ro
+    expose:
+      - 19998 # Alluxio master default RPC port
+      - 19999 # The Alluxio master’s default web UI port
+      - 19200 # The Alluxio master’s default port for internal leader election
+      - 20001 # The Alluxio job master’s default RPC port
+      - 20002 # The Alluxio job master’s default web UI port
+      - 20003 # The Alluxio job master’s default port for internal leader election
+    ports:
+      - 19999:19999 # The Alluxio master’s default web UI port
+      - 20002:20002 # The Alluxio job master’s default web UI port
+    command:
+      - /bin/bash 
+      - -c
+      - |
+        # Copy the Alluxio conf files from tmp dir
+        cp /tmp/config-files/alluxio/* /opt/alluxio/conf/
+        chmod 744 /opt/alluxio/conf/*
+
+        # Create the Alluxio Enterprise Edition license file
+        # Before running docker-compose, run the command:
+        #   export ALLUXIO_LICENSE_BASE64=`cat ./my-alluxio-license-file.json | base64`
+        #
+        if [[ -n "${ALLUXIO_LICENSE_BASE64}" ]]; then
+          echo "${ALLUXIO_LICENSE_BASE64}" | base64 -d > /opt/alluxio/license.json
+        fi
+
+        # Replace the template variable in alluxio-site.properties file with this hostname
+        myhostname=`hostname`
+        sed -i "s/THIS_HOSTNAME/$${myhostname}/g" /opt/alluxio/conf/alluxio-site.properties
+
+        # Optionally turn on Alluxio DEBUG mode in log4j
+        sed -i "s/=INFO/=DEBUG/g" /opt/alluxio/conf/log4j.properties
+
+        # Start the Alluxio master process
+        /opt/alluxio/bin/alluxio process start master
+
+        # sleep forever       
+        sleep infinity
+
+  alluxio-worker-1:
+    user: root
+    image: myalluxio/alluxio-enterprise:3.2.0-beta
+    hostname: alluxio-worker-1
+    container_name: alluxio-worker-1-qvn
+    networks:
+      custom:
+        ipv4_address: 178.26.0.14
+    shm_size: '1.5gb'
+    depends_on:
+      - alluxio-master-1
+      - etcd-1
+    volumes:
+      - ./config-files:/tmp/config-files:ro
+    expose:
+      - 29999 # The Alluxio worker’s default RPC port
+      - 30000 # The Alluxio worker’s default web UI port
+      - 30001 # The Alluxio job worker’s default RPC port
+      - 30002 # The Alluxio job worker’s default data port
+      - 30003 # The Alluxio job worker’s default web UI port
+    ports:
+      - 30000:30000 # The Alluxio worker’s default web UI port
+      - 30003:30003 # The Alluxio job worker’s default web UI port
+    command:
+      - /bin/bash 
+      - -c
+      - |
+        # Copy the Alluxio conf files from tmp dir
+        cp /tmp/config-files/alluxio/* /opt/alluxio/conf/
+        chmod 744 /opt/alluxio/conf/*
+
+        # Replace the template variable in alluxio-site.properties file with this hostname
+        myhostname=`hostname`
+        sed -i "s/THIS_HOSTNAME/$${myhostname}/g" /opt/alluxio/conf/alluxio-site.properties
+
+        # Optionally turn on Alluxio DEBUG mode in log4j
+        sed -i "s/=INFO/=DEBUG/g" /opt/alluxio/conf/log4j.properties
+
+        # Start the Alluxio worker process
+        /opt/alluxio/bin/alluxio process start worker
+
+        # sleep forever       
+        sleep infinity
+
+  minio:
+    image: docker.io/minio/minio:latest
+    hostname: minio
+    container_name: minio-qvn
+    networks:
+      custom:
+        ipv4_address: 178.26.0.5
+    expose:
+      - 9000
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - minio-data:/data
+    environment:
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: minio123
+    command: server --console-address ":9001" /data
+
+  minio-create-buckets:
+    image: docker.io/minio/mc:latest
+    container_name: minio-create-buckets-qvn
+    networks:
+      custom:
+        ipv4_address: 178.26.0.6
+    depends_on:
+      - minio
+    environment:
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: minio123
+    entrypoint: >
+      /bin/sh -c "
+      sleep 5;
+      /usr/bin/mc config host add myminio http://minio:9000 minio minio123;
+      if [ \"`/usr/bin/mc ls myminio`\" == \"\" ]; then 
+         echo \"Creating bucket myminio/minio-bucket1\" && \
+         /usr/bin/mc mb myminio/minio-bucket1 && \
+         /usr/bin/mc policy download myminio/minio-bucket1; 
+      else 
+         echo \"Bucket myminio/hive already exists, skipping create\"; 
+      fi;
+      exit 0
+      "
+  
+  ray:
+    image: docker.io/bitnami/ray:2.9.2
+    hostname: ray
+    container_name: ray-qvn
+    networks:
+      custom:
+        ipv4_address: 178.26.0.17
+    expose:
+      - 2379
+    ports:
+      - 2380:2380
+      - 4001:4001
+    volumes:
+      - etcd-1-data:/tmp/etcd_data
+
+  prometheus:
+    image: docker.io/prom/prometheus:v2.22.2
+    container_name: prometheus-qvn
+    hostname: prometheus
+    domainname: docker.com
+    networks:
+      custom:
+        ipv4_address: 178.26.0.8
+    expose:
+      - 9090
+    ports:
+      - 9090:9090
+    volumes:
+      - ./config-files/prometheus:/etc/prometheus
+      - prometheus-data:/prometheus
+    command: --web.enable-lifecycle --log.level=debug --config.file=/etc/prometheus/prometheus.yaml
+
+  grafana:
+    image: docker.io/grafana/grafana-oss:10.0.4
+    networks:
+      custom:
+        ipv4_address: 178.26.0.9
+    container_name: grafana-qvn
+    hostname: grafana
+    domainname: docker.com
+    ports:
+      - 3000:3000
+    volumes:
+      - ./config-files:/tmp/config-files:ro
+      - ./bootstrap/bootstrap-grafana.sh:/bootstrap.sh
+    user: root
+    entrypoint: ["/bootstrap.sh"]
+
+volumes:
+  alluxio-master-1-metastore-data:
+    driver: local
+  etcd-1-data:
+    driver: local
+  minio-data:
+    driver: local
+  etcd-data:
+    driver: local
+  prometheus-data:
+    driver: local
+
+networks:
+  custom:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 178.26.0.0/16
+        gateway: 178.26.0.1
