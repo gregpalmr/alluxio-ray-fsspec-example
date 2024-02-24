@@ -392,6 +392,10 @@ You should see the output that shows the status of the masters and workers. Like
           "freeCapacity": "1.5G"
      }
 
+If you want to see detailed log message from the Alluxio master node, you can run the command:
+
+     view /opt/alluxio/logs/master.log
+
 ### Step 9. Start a Ray cluster node
 
 Use a Ray Docker image to start a Ray node with Python integration. Run the command:
@@ -422,7 +426,7 @@ In the upper left side of the dashboard, click on the drop down menu (just to th
 
 ![alt Grafana Home Menu](images/Alluxio_Grafana_Home_Menu.png?raw=true)
 
-Then click on the "Dashboards" link to display the folders and dashboards and then click on the "Trino_Alluxio" folder link to view the "Alluxio Enterprise Dashboard" dashboard. Click on the link for that dashboard to view the panels.
+Then click on the "Dashboards" link to display the folders and dashboards and then click on the "Alluxio" folder link to view the "Alluxio Enterprise Dashboard" dashboard. Click on the link for that dashboard to view the panels.
 
 TBD
 
