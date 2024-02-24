@@ -323,7 +323,7 @@ a. Remove any previous docker volumes that may have been used by the containers,
 
      docker volume prune
 
-Launch the containers defined in the docker-compose.yml file using the command:
+b. Launch the containers defined in the docker-compose.yml file using the command:
 
      docker-compose up -d
 
@@ -358,7 +358,7 @@ Run the following command to launch a shell session in the worker container:
 
 ### Step 8. Check the status of the Alluxio Enterprise cluster
 
-a. In the Alluxio master shell session window, run the command to check the status of the cluster, including information about the Alluxio master and the worker. Run the command:
+a. In the Alluxio master alluxio-master-1-qvn shell session window, run the command to check the status of the cluster, including information about the Alluxio master and the worker. Run the command:
 
      alluxio info report
 
@@ -403,7 +403,6 @@ Use a Ray Docker image to start a Ray node with Python integration. Run the comm
      docker run -it --name ray bitnami/ray:latest
 
 This will launch a Python session that you can use to access Alluxio Enterprise via the Ray node.
-
 
 
 ### Step 10. Explore the Alluxio Enterprise 3.x Dashboard
