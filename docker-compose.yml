@@ -28,7 +28,6 @@ services:
       - --initial-cluster-state=new
       - --initial-cluster-token=etcd-cluster-1
 
-
   alluxio-master-1:
     user: root
     image: myalluxio/alluxio-enterprise:3.2.0-beta
@@ -170,21 +169,6 @@ services:
       exit 0
       "
   
-  ray:
-    image: docker.io/bitnami/ray:2.9.2
-    hostname: ray
-    container_name: ray-qvn
-    networks:
-      custom:
-        ipv4_address: 178.26.0.17
-    expose:
-      - 2379
-    ports:
-      - 2380:2380
-      - 4001:4001
-    volumes:
-      - etcd-1-data:/tmp/etcd_data
-
   prometheus:
     image: docker.io/prom/prometheus:v2.22.2
     container_name: prometheus-qvn
@@ -214,9 +198,9 @@ services:
       - 3000:3000
     volumes:
       - ./config-files:/tmp/config-files:ro
-      - ./bootstrap/bootstrap-grafana.sh:/bootstrap.sh
+      - ./scripts/grafana/bootstrap-grafana.sh:/bootstrap-grafana.sh:ro
     user: root
-    entrypoint: ["/bootstrap.sh"]
+    entrypoint: ["/bootstrap-grafana.sh"]
 
 volumes:
   alluxio-master-1-metastore-data:
