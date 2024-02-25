@@ -132,7 +132,7 @@ services:
     networks:
       custom:
         ipv4_address: 178.26.0.17
-    shm_size: '2.5gb'
+    shm_size: '3.7gb'
     volumes:
       - ray-data:/home/ray
     command:
