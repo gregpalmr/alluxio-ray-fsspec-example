@@ -1,5 +1,5 @@
 apiVersion: 1
 
 datasources:
-  - name: Trino_Alluxio_Prometheus
+  - name: Alluxio_Prometheus
     type: prometheus

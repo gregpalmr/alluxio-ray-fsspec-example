@@ -406,9 +406,9 @@ If you want to see detailed log message from the Alluxio master node, you can ru
 
      view /opt/alluxio/logs/master.log
 
-### Step 9. Load a test data set into Alluxio cache
+### Step 9. Load a test data set into the Alluxio cache
 
-For machine learning and training workloads, Alluxio Enterprise allows you to pre-load data from your training data sets into Alluxio cache. For this non-prod example environment, a portion of the NYC Taxi Ride data set has been staged in the MinIO S3 bucket. View the NYC Taxi Ride data set using the Alluxio CLI command:
+For machine learning and training workloads, Alluxio Enterprise allows you to pre-load data from your training data sets into the Alluxio cache. For this non-prod example environment, a portion of the NYC taxi ride data set has been staged in the MinIO S3 bucket. View the NYC taxi ride data set using the Alluxio CLI command:
 
      alluxio fs ls -R /data/nyc-taxi
 
@@ -430,7 +430,8 @@ Now, load that data into the Alluxio cache using the commands:
 It will show the job being submitted like this:
 
      $ alluxio job load --path s3://minio-bucket1/data/nyc-taxi --submit
-     Load 's3://minio-bucket1/data/nyc-taxi' is successfully submitted. JobId: 722a2cc2-7b98-429f-a72d-68ea30c20cfa
+     Load 's3://minio-bucket1/data/nyc-taxi' is successfully submitted. 
+     JobId: 722a2cc2-7b98-429f-a72d-68ea30c20cfa
 
 Then you can monitor the progress of the batch load job with the command:
 

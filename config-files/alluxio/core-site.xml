@@ -4,22 +4,49 @@
 <!--
   FILE: core-site.xml
 
-  DESC: This is the Alluxio Edge core-site.xml file and should be
-        placed in: /etc/trino/
+  DESC: This is the Alluxio Enterprise core-site.xml file and should be
+        placed in: 
+          For Trino: /etc/trino/
+          For Spark: /etc/spark/conf
 -->
 
 <configuration>
 
-  <!-- Enable the Alluxio Edge Cache Integration for s3 URIs -->
-  <property>
-    <name>fs.s3.impl</name>
-    <value>alluxio.emon.hadoop.FileSystemEE</value>
-  </property>
+    <!-- Enable the Alluxio Transparent URI feature for s3 and s3a end-points -->
+    <property>
+        <name>fs.s3a.impl</name>
+        <value>alluxio.hadoop.ShimFileSystem</value>
+    </property>
+    <property>
+	  <name>fs.AbstractFileSystem.s3a.impl</name>
+	  <value>alluxio.hadoop.AlluxioShimFileSystem</value>
+    </property>
+       
+     <!-- Don't apply Transparent URI for these files -->
+	<property>
+  	  <name>alluxio.user.shimfs.bypass.prefix.list</name>
+  	  <value></value>
+     </property>
 
-  <!-- Enable the Alluxio Edge Cache Integration for s3a URIs -->
-  <property>
-    <name>fs.s3a.impl</name>
-    <value>alluxio.emon.hadoop.FileSystemEE</value>
-  </property>
+     <!-- Don't auto mount Alluxio mounts -->
+	<property>
+  	  <name>alluxio.master.shimfs.auto.mount.enabled</name>
+  	  <value>true</value>
+	</property>
+
+     <!-- Specify the Alluxio master node -->
+     <!-- If using Alluxio in HA mode, specify alluxio.master.rpc.addresses instead -->
+    	<property>
+  	  <name>alluxio.master.hostname</name>
+  	  <value>alluxio-master</value>
+	</property>
+
+     <!-- Specify the Alluxio HA masters -->
+     <!--
+    	<property>
+  	  <name>alluxio.master.rpc.addresses</name>
+  	  <value>alluxio-master-1:19998,alluxio-master-2:19998,alluxio-master-3:19998</value>
+	</property>
+     -->
 
 </configuration>

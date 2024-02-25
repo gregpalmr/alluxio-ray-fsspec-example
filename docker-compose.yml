@@ -73,7 +73,7 @@ services:
         sed -i "s/THIS_HOSTNAME/$${myhostname}/g" /opt/alluxio/conf/alluxio-site.properties
 
         # Optionally turn on Alluxio DEBUG mode in log4j
-        sed -i "s/=INFO/=DEBUG/g" /opt/alluxio/conf/log4j.properties
+        # sed -i "s/=INFO/=DEBUG/g" /opt/alluxio/conf/log4j.properties
 
         # Start the Alluxio master process
         /opt/alluxio/bin/alluxio process start master
@@ -117,7 +117,7 @@ services:
         sed -i "s/THIS_HOSTNAME/$${myhostname}/g" /opt/alluxio/conf/alluxio-site.properties
 
         # Optionally turn on Alluxio DEBUG mode in log4j
-        sed -i "s/=INFO/=DEBUG/g" /opt/alluxio/conf/log4j.properties
+        #sed -i "s/=INFO/=DEBUG/g" /opt/alluxio/conf/log4j.properties
 
         # Start the Alluxio worker process
         /opt/alluxio/bin/alluxio process start worker
