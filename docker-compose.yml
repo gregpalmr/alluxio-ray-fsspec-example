@@ -125,6 +125,36 @@ services:
         tail -f /opt/alluxio/logs/worker.log        
         sleep infinity
 
+  ray:
+    image: rayproject/ray@sha256:498d3c8b72aef4d1043e3550a27a0034e2022de70c30b1fcc716f7972c3576bc
+    hostname: ray
+    container_name: ray-qvn
+    networks:
+      custom:
+        ipv4_address: 178.26.0.17
+    shm_size: '2.5gb'
+    volumes:
+      - ray-data:/home/ray
+    command:
+      - /bin/bash 
+      - -c
+      - |
+        # Install the Alluxio Python modules for the fsspec implementation
+        mkdir alluxio-fsspec-env && cd alluxio-fsspec-env
+        git clone  https://github.com/Alluxio/alluxio-py.git && cd alluxio-py
+        python3 setup.py bdist_wheel && pip3 install dist/alluxio-0.3-py3-none-any.whl
+        pip install s3fs
+        cd ..
+        git clone https://github.com/fsspec/alluxiofs.git  && cd alluxiofs
+        python3 setup.py bdist_wheel && pip3 install dist/alluxiofs-0.1-py3-none-any.whl
+        cd $HOME
+
+        # Install Ray Python modules (if not already installed)
+        pip install "ray[data,train]"
+
+        # Sleep forever
+        sleep infinity
+
   minio:
     image: docker.io/minio/minio:latest
     hostname: minio
@@ -209,6 +239,8 @@ volumes:
   alluxio-master-1-metastore-data:
     driver: local
   etcd-1-data:
+    driver: local
+  ray-data:
     driver: local
   minio-data:
     driver: local
