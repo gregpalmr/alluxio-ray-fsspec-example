@@ -528,4 +528,4 @@ In the Alluxio dashboard you will see metrics around the Alluxio cluster status 
 
 --
 
-Please Direct questions or comments to greg.palmer@alluxio.com
+Please direct questions or comments to greg.palmer@alluxio.com
