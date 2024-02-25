@@ -551,6 +551,8 @@ Then click on the "Dashboards" link to display the folders and dashboards and th
 
 In the Alluxio dashboard you will see metrics around the Alluxio cluster status and the cache statistics and storage usages.
 
+![alt Alluxio AI Dashboard](images/alluxio-ai-dashboard.png?raw=true)
+
 ### Step 11. Destroy the docker containers and volumes
 
 Run the following commands to destroy the Docker containers and the volumes that were created.
