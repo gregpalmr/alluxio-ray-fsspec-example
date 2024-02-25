@@ -415,7 +415,7 @@ For machine learning and training workloads, Alluxio Enterprise allows you to pr
 Alluxio will show the contents of the test data set directory in the S3 bucket:
 
      $ alluxio fs ls -R  /data/nyc-taxi
-     drwx------      0                 01-01-1970 00:00:00:000  DIR /data/nyc-taxi/yellow-tripdata
+     drwx------         0  01-01-1970 00:00:00:000  DIR /data/nyc-taxi/yellow-tripdata
      -rwx------  54999465  02-25-2024 01:07:44:978 FILE /data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-06.parquet
      -rwx------  47673370  02-25-2024 01:07:44:889 FILE /data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-01.parquet
      -rwx------  47748012  02-25-2024 01:07:44:974 FILE /data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-02.parquet
