@@ -454,10 +454,6 @@ Which will show you the progress of the load job:
           Subtask Retry rate: 0.00%
           Subtasks on Retry Dead Letter Queue: 0
 
-### Step 10. Access Alluxio via its fsspec implementation
-
-TBD
-
 ### Step 10. Load data from the fsspec implementation on a Ray cluster node
 
 For this non-prod environment, a Ray Docker container has been pre-launched and the Alluxio fsspec components have been installed using the commands:
@@ -483,23 +479,24 @@ a. Open a shell session into the Ray container with the command:
 
 The "-qvn" suffice is just a unique identifier.
 
-b. Launch a Python session and run some commands to read the NYC taxi ride data that is stored in the local MinIO S3 compatible storage and cached by Alluxio. Run these commands:
+b. Launch a Python session and run some commands to read the NYC taxi ride data that is stored in the local MinIO S3 compatible storage and cached by Alluxio. Launch a Python session:
 
      python
-     >>>
 
-     import fsspec
-     import ray
-     from alluxiofs import AlluxioFileSystem
+Then run some Python commands:
 
-     # Register the Alluxio fsspec implementation
-     fsspec.register_implementation("alluxio", AlluxioFileSystem, clobber=True)
-     alluxio = fsspec.filesystem(
-       "alluxio", etcd_hosts="etcd-1", target_protocol="s3"
-     )
-
-     # Pass the initialized Alluxio filesystem to Ray and read the parquet data set
-     ds = ray.data.read_parquet("s3://minio-bucket1/data/nyc-taxi/yellow-tripdata", filesystem=alluxio)
+    import fsspec
+    import ray
+    from alluxiofs import AlluxioFileSystem
+    
+    # Register the Alluxio fsspec implementation
+    fsspec.register_implementation("alluxio", AlluxioFileSystem, clobber=True)
+    alluxio = fsspec.filesystem(
+      "alluxio", etcd_hosts="etcd-1", target_protocol="s3"
+    )
+    
+    # Pass the initialized Alluxio filesystem to Ray and read the parquet data set
+    ds = ray.data.read_parquet("s3://minio-bucket1/data/nyc-taxi/yellow-tripdata", filesystem=alluxio)
 
 You will see the ray.data.read_parquet() method reading through the parquet file. Later, you can experiment with the bulk reader like this:
 
