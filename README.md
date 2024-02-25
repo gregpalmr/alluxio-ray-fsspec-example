@@ -497,6 +497,8 @@ Then run some Python commands:
     
     # Pass the initialized Alluxio filesystem to Ray and read the parquet data set
     ds = ray.data.read_parquet("s3://minio-bucket1/data/nyc-taxi/yellow-tripdata", filesystem=alluxio)
+    
+    # End of Python example
 
 You will see the ray.data.read_parquet() method reading through the parquet file. Later, you can experiment with the bulk reader like this:
 
