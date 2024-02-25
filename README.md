@@ -410,49 +410,55 @@ If you want to see detailed log message from the Alluxio master node, you can ru
 
 For machine learning and training workloads, Alluxio Enterprise allows you to pre-load data from your training data sets into the Alluxio cache. For this non-prod example environment, a portion of the NYC taxi ride data set has been staged in the MinIO S3 bucket. View the NYC taxi ride data set using the Alluxio CLI command:
 
-     alluxio fs ls -R /data/nyc-taxi
+    alluxio fs ls -R /data/nyc-taxi-csv
 
 Alluxio will show the contents of the test data set directory in the S3 bucket:
 
-     $ alluxio fs ls -R  /data/nyc-taxi
-     drwx------         0  01-01-1970 00:00:00:000  DIR /data/nyc-taxi/yellow-tripdata
-     -rwx------  54999465  02-25-2024 01:07:44:978 FILE /data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-06.parquet
-     -rwx------  47673370  02-25-2024 01:07:44:889 FILE /data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-01.parquet
-     -rwx------  47748012  02-25-2024 01:07:44:974 FILE /data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-02.parquet
-     -rwx------  58654627  02-25-2024 01:07:44:971 FILE /data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-05.parquet
-     -rwx------  54222699  02-25-2024 01:07:44:988 FILE /data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-04.parquet
-     -rwx------  56127762  02-25-2024 01:07:44:982 FILE /data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-03.parquet
+    $ alluxio fs ls -R /data/nyc-taxi-csv
+    drwx------          0                 01-01-1970 00:00:00:000  DIR /data/nyc-taxi-csv/green-tripdata
+    -rwx------     6912251 02-25-2024 21:22:15:742 FILE /data/nyc-taxi-csv/green-tripdata/green_tripdata_2021-01.csv
+    -rwx------    10464188 02-25-2024 21:22:18:980 FILE /data/nyc-taxi-csv/green-tripdata/green_tripdata_2021-12.csv
+    -rwx------     7558871 02-25-2024 21:22:15:840 FILE /data/nyc-taxi-csv/green-tripdata/green_tripdata_2021-03.csv
+    -rwx------     9894572 02-25-2024 21:22:18:738 FILE /data/nyc-taxi-csv/green-tripdata/green_tripdata_2021-09.csv
+    -rwx------     7980769 02-25-2024 21:22:16:203 FILE /data/nyc-taxi-csv/green-tripdata/green_tripdata_2021-05.csv
+    -rwx------     7591709 02-25-2024 21:22:16:355 FILE /data/nyc-taxi-csv/green-tripdata/green_tripdata_2021-07.csv
+    -rwx------    11250176 02-25-2024 21:22:18:918 FILE /data/nyc-taxi-csv/green-tripdata/green_tripdata_2021-11.csv
+    -rwx------    11500622 02-25-2024 21:22:18:774 FILE /data/nyc-taxi-csv/green-tripdata/green_tripdata_2021-10.csv
+    -rwx------     5835331 02-25-2024 21:22:15:845 FILE /data/nyc-taxi-csv/green-tripdata/green_tripdata_2021-02.csv
+    -rwx------     7843615 02-25-2024 21:22:15:840 FILE /data/nyc-taxi-csv/green-tripdata/green_tripdata_2021-04.csv
+    -rwx------     8585288 02-25-2024 21:22:16:441 FILE /data/nyc-taxi-csv/green-tripdata/green_tripdata_2021-08.csv
+    -rwx------     7878004 02-25-2024 21:22:16:443 FILE /data/nyc-taxi-csv/green-tripdata/green_tripdata_2021-06.csv
 
 Now, load that data into the Alluxio cache using the commands:
 
-     alluxio job load --path s3://minio-bucket1/data/nyc-taxi --submit
+     alluxio job load --path s3://minio-bucket1/data/nyc-taxi-csv --submit
 
 It will show the job being submitted like this:
 
-     $ alluxio job load --path s3://minio-bucket1/data/nyc-taxi --submit
-     Load 's3://minio-bucket1/data/nyc-taxi' is successfully submitted. 
+     $ alluxio job load --path s3://minio-bucket1/data/nyc-taxi-csv --submit
+     Load 's3://minio-bucket1/data/nyc-tax-csv' is successfully submitted. 
      JobId: 722a2cc2-7b98-429f-a72d-68ea30c20cfa
 
 Then you can monitor the progress of the batch load job with the command:
 
-     alluxio job load --path s3://minio-bucket1/data/nyc-taxi --progress
+     alluxio job load --path s3://minio-bucket1/data/nyc-taxi-csv --progress
 
 Which will show you the progress of the load job:
 
-     $ alluxio job load --path s3://minio-bucket1/data/nyc-taxi --progress
-     Progress for loading path 's3://minio-bucket1/data/nyc-taxi':
-     Settings: bandwidth: unlimited     verify: false  metadata-only: false
-          Time Elapsed: 00:01:48
-          Job State: SUCCEEDED
-          Inodes Scanned: 7
-          Inodes Processed: 7
-          Bytes Loaded: 304.63MB out of 304.63MB
-          Throughput: 2888.33KB/s
-          File Failure rate: 0.00%
-          Subtask Failure rate: 0.00%
-          Files Failed: 0
-          Subtask Retry rate: 0.00%
-          Subtasks on Retry Dead Letter Queue: 0
+    $ alluxio job load --path s3://minio-bucket1/data/nyc-taxi-csv --progress
+    Progress for loading path 's3://minio-bucket1/data/nyc-taxi-csv':
+         Settings: bandwidth: unlimited     verify: false  metadata-only: false
+         Time Elapsed: 00:00:02
+         Job State: SUCCEEDED
+         Inodes Scanned: 13
+         Inodes Processed: 13
+         Bytes Loaded: 98.51MB out of 98.51MB
+         Throughput: 49.26MB/s
+         File Failure rate: 0.00%
+         Subtask Failure rate: 0.00%
+         Files Failed: 0
+         Subtask Retry rate: 0.00%
+         Subtasks on Retry Dead Letter Queue: 0
 
 ### Step 10. Load data from the fsspec implementation on a Ray cluster node
 
@@ -483,7 +489,7 @@ b. Launch a Python session and run some commands to read the NYC taxi ride data 
 
      python
 
-Then run some Python commands:
+Then run some Python commands to access Alluxio via the fsspec implementation:
 
     import fsspec
     import ray
@@ -495,14 +501,33 @@ Then run some Python commands:
       "alluxio", etcd_hosts="etcd-1", target_protocol="s3"
     )
     
-    # Pass the initialized Alluxio filesystem to Ray and read the parquet data set
-    ds = ray.data.read_parquet("s3://minio-bucket1/data/nyc-taxi/yellow-tripdata", filesystem=alluxio)
+    # Pass the initialized Alluxio filesystem to Ray and read the NYC taxi ride data set
+    ds = ray.data.read_csv("s3://minio-bucket1/data/nyc-taxi-csv/green-tripdata/green_tripdata_2021-01.csv", filesystem=alluxio)
     
+    # Get a count of the number of records in the single CSV file
+    ds.count()
+    
+    # Display the schema derived from the CSV file header record
+    ds.schema()
+    
+    # Display the header record
+    ds.take(1)
+    
+    # Display the first data record
+    ds.take(2)
+    
+    # Read multiple CSV files:
+    ds2 = ray.data.read_csv("s3://minio-bucket1/data/nyc-taxi-csv/green-tripdata/", filesystem=alluxio)
+    
+    # Get a count of the number of records in the twelve CSV files
+    ds2.count()
+      
     # End of Python example
+    
 
-You will see the ray.data.read_parquet() method reading through the parquet file. Later, you can experiment with the bulk reader like this:
+You can view the Ray dashboard by pointing your web browser to this address:
 
-     ds = ray.data.read_parquet_bulk("s3://minio-bucket1/data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-01.parquet, filesystem=alluxio)
+    http://localhost:8265
 
 ### Step 11. Explore the Alluxio Enterprise 3.x Dashboard
 
