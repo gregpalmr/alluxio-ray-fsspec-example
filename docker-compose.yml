@@ -135,6 +135,8 @@ services:
     shm_size: '3.7gb'
     volumes:
       - ray-data:/home/ray
+    ports:
+      - 8265:8265
     command:
       - /bin/bash 
       - -c
