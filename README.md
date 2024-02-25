@@ -416,12 +416,12 @@ Alluxio will show the contents of the test data set directory in the S3 bucket:
 
      $ alluxio fs ls -R  /data/nyc-taxi
      drwx------      0                 01-01-1970 00:00:00:000  DIR /data/nyc-taxi/yellow-tripdata
-     -rwx------                                       54999465                 02-25-2024 01:07:44:978 FILE /data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-06.parquet
-     -rwx------                                       47673370                 02-25-2024 01:07:44:889 FILE /data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-01.parquet
-     -rwx------                                       47748012                 02-25-2024 01:07:44:974 FILE /data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-02.parquet
-     -rwx------                                       58654627                 02-25-2024 01:07:44:971 FILE /data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-05.parquet
-     -rwx------                                       54222699                 02-25-2024 01:07:44:988 FILE /data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-04.parquet
-     -rwx------                                       56127762                 02-25-2024 01:07:44:982 FILE /data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-03.parquet
+     -rwx------  54999465  02-25-2024 01:07:44:978 FILE /data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-06.parquet
+     -rwx------  47673370  02-25-2024 01:07:44:889 FILE /data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-01.parquet
+     -rwx------  47748012  02-25-2024 01:07:44:974 FILE /data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-02.parquet
+     -rwx------  58654627  02-25-2024 01:07:44:971 FILE /data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-05.parquet
+     -rwx------  54222699  02-25-2024 01:07:44:988 FILE /data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-04.parquet
+     -rwx------  56127762  02-25-2024 01:07:44:982 FILE /data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-03.parquet
 
 Now, load that data into the Alluxio cache using the commands:
 
@@ -458,7 +458,7 @@ This will show the cache usage information like this:
      $ alluxio info cache
      TBD
 
-### Step 10. Start a Ray cluster node
+### Step 10. Load data from the fsspec implementation on a Ray cluster node
 
 Use a Ray Docker image to start a Ray node with Python integration. Run the command:
 
