@@ -392,20 +392,114 @@ You should see the output that shows the status of the masters and workers. Like
           "freeCapacity": "1.5G"
      }
 
+Use the following Alluxio CLI command to list the worker nodes and status:
+
+     alluxio info nodes
+
+It will show a single worker node with a status of ONLINE:
+
+     $ alluxio info nodes
+     WorkerId  Address   Status
+     worker-25a2f9ac-87b1-445f-880f-8688567ee153  alluxio-worker-1:29999   ONLINE
+
 If you want to see detailed log message from the Alluxio master node, you can run the command:
 
      view /opt/alluxio/logs/master.log
 
-### Step 9. Start a Ray cluster node
+### Step 9. Load a test data set into Alluxio cache
+
+For machine learning and training workloads, Alluxio Enterprise allows you to pre-load data from your training data sets into Alluxio cache. For this non-prod example environment, a portion of the NYC Taxi Ride data set has been staged in the MinIO S3 bucket. View the NYC Taxi Ride data set using the Alluxio CLI command:
+
+     alluxio fs ls -R /data/nyc-taxi
+
+Alluxio will show the contents of the test data set directory in the S3 bucket:
+
+     $ alluxio fs ls -R  /data/nyc-taxi
+     drwx------      0                 01-01-1970 00:00:00:000  DIR /data/nyc-taxi/yellow-tripdata
+     -rwx------                                       54999465                 02-25-2024 01:07:44:978 FILE /data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-06.parquet
+     -rwx------                                       47673370                 02-25-2024 01:07:44:889 FILE /data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-01.parquet
+     -rwx------                                       47748012                 02-25-2024 01:07:44:974 FILE /data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-02.parquet
+     -rwx------                                       58654627                 02-25-2024 01:07:44:971 FILE /data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-05.parquet
+     -rwx------                                       54222699                 02-25-2024 01:07:44:988 FILE /data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-04.parquet
+     -rwx------                                       56127762                 02-25-2024 01:07:44:982 FILE /data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-03.parquet
+
+Now, load that data into the Alluxio cache using the commands:
+
+     alluxio job load --path s3://minio-bucket1/data/nyc-taxi --submit
+
+It will show the job being submitted like this:
+
+     $ alluxio job load --path s3://minio-bucket1/data/nyc-taxi --submit
+     Load 's3://minio-bucket1/data/nyc-taxi' is successfully submitted. JobId: 722a2cc2-7b98-429f-a72d-68ea30c20cfa
+
+Then you can monitor the progress of the batch load job with the command:
+
+     $ alluxio job load --path s3://minio-bucket1/data/nyc-taxi --progress
+     Progress for loading path 's3://minio-bucket1/data/nyc-taxi':
+     Settings: bandwidth: unlimited     verify: false  metadata-only: false
+          Time Elapsed: 00:01:48
+          Job State: SUCCEEDED
+          Inodes Scanned: 7
+          Inodes Processed: 7
+          Bytes Loaded: 304.63MB out of 304.63MB
+          Throughput: 2888.33KB/s
+          File Failure rate: 0.00%
+          Subtask Failure rate: 0.00%
+          Files Failed: 0
+          Subtask Retry rate: 0.00%
+          Subtasks on Retry Dead Letter Queue: 0
+
+Then you can see the Alluxio cache usage stats using the command:
+
+     alluxio info cache
+
+This will show the cache usage information like this:
+
+     $ alluxio info cache
+     TBD
+
+### Step 10. Start a Ray cluster node
 
 Use a Ray Docker image to start a Ray node with Python integration. Run the command:
 
-     docker run -it --name ray bitnami/ray:latest
+     docker run --rm -it --name ray-qvn bitnami/ray:latest
 
 This will launch a Python session that you can use to access Alluxio Enterprise via the Ray node.
 
+Now, load the ray Python module if it is not already loaded. use the Python commands:
 
-### Step 10. Explore the Alluxio Enterprise 3.x Dashboard
+     >>> 
+     import subprocess
+     import sys
+
+     def install(package):
+         subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+     # Install the Ray Python modules
+     install("ray[data,train]")
+
+     # Install the Alluxio fsspec Python module
+     install("xxx")
+
+Then have Ray load the data set using Alluxio's fsspec implementation. Use the Python commands:
+
+     >>>
+     import fsspec
+     import ray
+     from alluxiofs import AlluxioFileSystem
+
+     fsspec.register_implementation("alluxio", AlluxioFileSystem, clobber=True)
+     alluxio = fsspec.filesystem(
+          "alluxio", etcd_hosts="etcd-1", target_protocol="s3"
+     )
+
+     # Pass the initialized Alluxio filesystem to Ray
+     ds = ray.data.read_parquet_bulk("s3://minio-bucket1/data/nyc-taxi", filesystem=alluxio)
+
+     dataset_size = ds.count()
+
+
+### Step 11. Explore the Alluxio Enterprise 3.x Dashboard
 
 a. Display the Prometheus Web console
 
