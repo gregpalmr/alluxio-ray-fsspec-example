@@ -67,7 +67,7 @@ Install Docker desktop on your laptop, including the docker-compose command.
 
      See: https://www.docker.com/products/docker-desktop/
 
-#### b. Install required utilites, including:
+#### b. Install required utilities, including:
 
 - wget or curl utility
 - tar utility
@@ -195,7 +195,7 @@ EOF
 
 Alluxio Enterprise can run with multiple masters and with multiple workers. In this non-production implementation, we will only have a single master node and a single worker node.
 
-#### a. Create the Dockerfile spec file
+#### a. Create the Dockerfile build spec file
 
 To build a new Docker image file, the Docker build utility requires a specification file named "Dockerfile".  Create this file and include the steps needed to copy the Alluxio Enterprise installation files and configuration files into the Docker image. For this deployment, create the Dockerfile with these commands:
 
@@ -305,27 +305,27 @@ If you intend to deploy Alluxio Enterprise 3.x on a Kubernetes cluster, then you
 
 If you are using DockerHub as your docker registry, Use the "docker push" command to upload the image, like this:
 
-     docker login --username=<PUT_YOUR_DOCKER_HUB_USER_ID_HERE>
-
-     docker tag <PUT_YOUR_NEW_IMAGE_ID_HERE> <PUT_YOUR_DOCKER_HUB_USER_ID_HERE>/alluxio-enterprise:3.2.0-beta
-
-     docker push <PUT_YOUR_DOCKER_HUB_USER_ID_HERE>/alluxio-enterprise:3.2.0-beta
-
-     docker pull <PUT_YOUR_DOCKER_HUB_USER_ID_HERE>/alluxio-enterprise:3.2.0-beta
+    docker login --username=<PUT_YOUR_DOCKER_HUB_USER_ID_HERE>
+    
+    docker tag <PUT_YOUR_NEW_IMAGE_ID_HERE> <PUT_YOUR_DOCKER_HUB_USER_ID_HERE>/alluxio-enterprise:3.2.0-beta
+    
+    docker push <PUT_YOUR_DOCKER_HUB_USER_ID_HERE>/alluxio-enterprise:3.2.0-beta
+    
+    docker pull <PUT_YOUR_DOCKER_HUB_USER_ID_HERE>/alluxio-enterprise:3.2.0-beta
 
 ### Step 6. Launch the docker containers with Docker Compose
 
 In this simple non-prod deployment, we will be using the Docker Compose utility to launch Alluxio Enterprise 3.x with the newly built Alluxio Docker image. Later, if you intend to launch the Alluxio Enterprise Docker image on a Kubernetes cluster, then you would follow the instructions provided Alluxio here:
 
-     https://docs.alluxio.io/ee-ai/user/stable/en/kubernetes/Install-Alluxio-On-Kubernetes.html
+    https://docs.alluxio.io/ee-ai/user/stable/en/kubernetes/Install-Alluxio-On-Kubernetes.html
 
 a. Remove any previous docker volumes that may have been used by the containers, using the command:
 
-     docker volume prune
+    docker volume prune
 
 b. Launch the containers defined in the docker-compose.yml file using the command:
 
-     COMPOSE_HTTP_TIMEOUT=300 docker-compose up -d
+    COMPOSE_HTTP_TIMEOUT=300 docker-compose up -d
 
 The command will create the network object and the docker volumes, then it will take some time to pull the various docker images. When it is complete, you see this output:
 
@@ -350,17 +350,17 @@ If you experience errors for not enough CPU, Memory or disk resources, use your 
 
 Open two shell sessions - one into the alluxio-master-1-qvn Docker container and one into the alluxio-worker-1-qvn Docker container. Run the following command to launch a shell session in the master container:
 
-     docker exec -it alluxio-master-1-qvn bash
+    docker exec -it alluxio-master-1-qvn bash
 
 Run the following command to launch a shell session in the worker container:
 
-     docker exec -it alluxio-worker-1-qvn bash
+    docker exec -it alluxio-worker-1-qvn bash
 
 ### Step 8. Check the status of the Alluxio Enterprise cluster
 
 a. In the Alluxio master alluxio-master-1-qvn shell session window, run the command to check the status of the cluster, including information about the Alluxio master and the worker. Run the command:
 
-     alluxio info report
+    alluxio info report
 
 You should see the output that shows the status of the masters and workers. Like this:
 
@@ -394,17 +394,17 @@ You should see the output that shows the status of the masters and workers. Like
 
 Use the following Alluxio CLI command to list the worker nodes and status:
 
-     alluxio info nodes
+    alluxio info nodes
 
 It will show a single worker node with a status of ONLINE:
 
-     $ alluxio info nodes
-     WorkerId  Address   Status
-     worker-25a2f9ac-87b1-445f-880f-8688567ee153  alluxio-worker-1:29999   ONLINE
+    $ alluxio info nodes
+    WorkerId  Address   Status
+    worker-25a2f9ac-87b1-445f-880f-8688567ee153  alluxio-worker-1:29999   ONLINE
 
 If you want to see detailed log message from the Alluxio master node, you can run the command:
 
-     view /opt/alluxio/logs/master.log
+    view /opt/alluxio/logs/master.log
 
 ### Step 9. Load a test data set into the Alluxio cache
 
@@ -550,6 +550,16 @@ In the upper left side of the dashboard, click on the drop down menu (just to th
 Then click on the "Dashboards" link to display the folders and dashboards and then click on the "Alluxio" folder link to view the "Alluxio AI Enterprise Edition Dashboard" dashboard. Click on the link for that dashboard to view the panels.
 
 In the Alluxio dashboard you will see metrics around the Alluxio cluster status and the cache statistics and storage usages.
+
+### Step 11. Destroy the docker containers and volumes
+
+Run the following commands to destroy the Docker containers and the volumes that were created.
+
+    docker-compose down
+
+and
+
+    docker volume prune
 
 --
 
