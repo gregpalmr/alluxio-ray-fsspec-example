@@ -325,7 +325,7 @@ a. Remove any previous docker volumes that may have been used by the containers,
 
 b. Launch the containers defined in the docker-compose.yml file using the command:
 
-     docker-compose up -d
+     COMPOSE_HTTP_TIMEOUT=300 docker-compose up -d
 
 The command will create the network object and the docker volumes, then it will take some time to pull the various docker images. When it is complete, you see this output:
 
@@ -435,6 +435,10 @@ It will show the job being submitted like this:
 
 Then you can monitor the progress of the batch load job with the command:
 
+     alluxio job load --path s3://minio-bucket1/data/nyc-taxi --progress
+
+Which will show you the progress of the load job:
+
      $ alluxio job load --path s3://minio-bucket1/data/nyc-taxi --progress
      Progress for loading path 's3://minio-bucket1/data/nyc-taxi':
      Settings: bandwidth: unlimited     verify: false  metadata-only: false
@@ -450,55 +454,56 @@ Then you can monitor the progress of the batch load job with the command:
           Subtask Retry rate: 0.00%
           Subtasks on Retry Dead Letter Queue: 0
 
-Then you can see the Alluxio cache usage stats using the command:
+### Step 10. Access Alluxio via its fsspec implementation
 
-     alluxio info cache
-
-This will show the cache usage information like this:
-
-     $ alluxio info cache
-     TBD
+TBD
 
 ### Step 10. Load data from the fsspec implementation on a Ray cluster node
 
-a. Use a Ray Docker image to start a Ray node with Python integration. Run the command:
+For this non-prod environment, a Ray Docker container has been pre-launched and the Alluxio fsspec components have been installed using the commands:
 
-     docker run --rm -it --name ray-qvn bitnami/ray:latest
+     # Install the Alluxio Python modules for the fsspec implementation
+     mkdir alluxio-fsspec-env && cd alluxio-fsspec-env
+     git clone  https://github.com/Alluxio/alluxio-py.git && cd alluxio-py
+     python3 setup.py bdist_wheel && pip3 install dist/alluxio-0.3-py3-none-any.whl
+     pip install s3fs
+     cd ..
+     git clone https://github.com/fsspec/alluxiofs.git  && cd alluxiofs
+     python3 setup.py bdist_wheel && pip3 install dist/alluxiofs-0.1-py3-none-any.whl
+     cd $HOME
+     
+     # Install Ray Python modules (if not already installed)
+     pip install "ray[data,train]"
 
-This will launch a Python session that you can use to access Alluxio Enterprise via the Ray node.
+You can use this pre-launch container to experiment with the ray.data.* methods as they use the Alluxio fsspec implementation and access the very small Alluxio cluster (1 worker node with 1.5GB of cache).
 
-b. Now, load the ray Python module if it is not already loaded. use the Python commands:
+a. Open a shell session into the Ray container with the command:
 
-     >>> 
-     import subprocess
-     import sys
+     docker exec -it ray-qvn bash
 
-     def install(package):
-         subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+The "-qvn" suffice is just a unique identifier.
 
-     # Install the Ray Python modules
-     install("ray[data,train]")
+b. Launch a Python session and run some commands to read the NYC taxi ride data that is stored in the local MinIO S3 compatible storage and cached by Alluxio. Run these commands:
 
-     # Install the Alluxio fsspec Python module
-     install("xxx")
-
-c. Then have Ray load the data set using Alluxio's fsspec implementation. Use the Python commands:
-
+     python
      >>>
+
      import fsspec
      import ray
      from alluxiofs import AlluxioFileSystem
 
+     # Register the Alluxio fsspec implementation
      fsspec.register_implementation("alluxio", AlluxioFileSystem, clobber=True)
      alluxio = fsspec.filesystem(
-          "alluxio", etcd_hosts="etcd-1", target_protocol="s3"
+       "alluxio", etcd_hosts="etcd-1", target_protocol="s3"
      )
 
-     # Pass the initialized Alluxio filesystem to Ray
-     ds = ray.data.read_parquet_bulk("s3://minio-bucket1/data/nyc-taxi", filesystem=alluxio)
+     # Pass the initialized Alluxio filesystem to Ray and read the parquet data set
+     ds = ray.data.read_parquet("s3://minio-bucket1/data/nyc-taxi/yellow-tripdata", filesystem=alluxio)
 
-     dataset_size = ds.count()
+You will see the ray.data.read_parquet() method reading through the parquet file. Later, you can experiment with the bulk reader like this:
 
+     ds = ray.data.read_parquet_bulk("s3://minio-bucket1/data/nyc-taxi/yellow-tripdata/yellow_tripdata_2023-01.parquet, filesystem=alluxio)
 
 ### Step 11. Explore the Alluxio Enterprise 3.x Dashboard
 
@@ -508,7 +513,7 @@ Point your Web browser to the Prometheus docker container at:
 
      http://localhost:9090
 
-b. Disoplay the Grafana Web console
+b. Display the Grafana Web console
 
 Point your Web browser to the Grafana docker container at:
 
@@ -518,11 +523,9 @@ When prompted, sign in with the user "admin" and the password "admin". When you 
 
 In the upper left side of the dashboard, click on the drop down menu (just to the left of the "Home" label).
 
-![alt Grafana Home Menu](images/Alluxio_Grafana_Home_Menu.png?raw=true)
+Then click on the "Dashboards" link to display the folders and dashboards and then click on the "Alluxio" folder link to view the "Alluxio AI Enterprise Edition Dashboard" dashboard. Click on the link for that dashboard to view the panels.
 
-Then click on the "Dashboards" link to display the folders and dashboards and then click on the "Alluxio" folder link to view the "Alluxio Enterprise Dashboard" dashboard. Click on the link for that dashboard to view the panels.
-
-TBD
+In the Alluxio dashboard you will see metrics around the Alluxio cluster status and the cache statistics and storage usages.
 
 --
 
