@@ -1,6 +1,6 @@
 # alluxio-ray-fsspec-example
 
-### A demonstration of Alluxio Enterprise 3.x serving data using the Filesystem Spec (fsspec) for Python on a Ray cluster.
+### A demonstration of Alluxio AI Enterprise Edition 3.x serving data using the Filesystem Spec (fsspec) for Python on a Ray cluster.
 
 ## INTRODUCTION
 
@@ -30,21 +30,21 @@ Ray efficiently orchestrates machine learning pipelines, integrating seamlessly 
 
 Ray utilizes PyArrow to load and convert data formats into Arrow format, which will be further consumed by the next stages in the Ray pipeline. PyArrow delegates storage connection issues to the fsspec framework. Alluxio functions as an intermediary caching layer between Ray and underlying storage systems like S3, Azure blob storage, and Hugging Face.
 
-![alt Alluxio Enterprise with Ray ](images/alluxio-with-ray-diagram.png?raw=true)
+![alt Alluxio with Ray ](images/alluxio-with-ray-diagram.png?raw=true)
 
-This git repo provides an example environment where Alluxio Enterprise 3.x with its fsspec implementation allows Python based workloads running on Ray to access model training data much more efficiently.
+This git repo provides an example environment where Alluxio AI Enterprise Edition 3.x with its fsspec implementation allows Python based workloads running on Ray to access model training data much more efficiently.
 
 NOTE: This git repo environment is for educational purposes only and should not be use for any kind of real or production deployments.
 
-### Alluxio Enterprise fsspec implementation
+### Alluxio fsspec implementation
 
-Fsspec is a Python filesystem interface that well-known storage system vendors have implemented to interact with the Python ecosystem. Alluxio Enterprise 3.x also implements the fsspec access method and integrates with Ray cluster like this:
+Fsspec is a Python filesystem interface that well-known storage system vendors have implemented to interact with the Python ecosystem. Alluxio AI Enterprise Edition also implements the fsspec access method and integrates with Ray cluster like this:
 
-![alt Alluxio Enterprise Fsspec implementation ](images/alluxio-fsspec-diagram.png?raw=true)
+![alt Alluxio Fsspec implementation ](images/alluxio-fsspec-diagram.png?raw=true)
 
 #### Alluxio Fsspec Design & Limitations
 
-The Alluxio Enterprise fsspec implementation is designed with Alluxio caching capabilities on top of an existing underlying storage fsspec. 
+The Alluxio's fsspec implementation is designed with Alluxio caching capabilities on top of an existing underlying storage fsspec. 
 
 - All operations that are not fully supported by Alluxio (e.g. write operations) will fallback to the underlying storage fsspec implementation. 
 - All operations that are failed in Alluxio will fallback to the underlying storage fsspec
@@ -82,23 +82,23 @@ Use the git command to clone this repo (or download the zip file from the github
 
      cd alluxio-ray-fsspec-example
 
-### Step 3. Download the Alluxio Enterprise 3.x installation tar file
+### Step 3. Download the Alluxio AI Enterprise Edition installation tar file
 
 #### a. Request a trial version
 
-Contact your Alluxio account representative at sales@alluxio.com and request a trial version of Alluxio Enterprise 3.x. Follow their instructions for downloading the installation tar file.
+Contact your Alluxio account representative at sales@alluxio.com and request a trial version of Alluxio AI Enterprise Edition. Follow their instructions for downloading the installation tar file.
 
 #### b. Copy the tar file
 
-Put the Alluxio Enterprise 3.x installation tar file into the "local-files" directory, using the command:
+Put the Alluxio installation tar file into the "local-files" directory, using the command:
 
      cp ~/Downloads/alluxio-enterprise-3.2.0-beta-bin-17a5dff6e9.tar.gz ./local-files/
 
 ### Step 4. Create the Alluxio configuration files
 
-Alluxio Enterprise 3.x is designed cache data from under storage envrionments and make it available to Python based workloads via the fsspec access method. In this step you create the Alluxio configuration files.
+Alluxio is designed to cache data from under storage envrionments and make it available to Python based workloads via the fsspec access method. In this step you create the Alluxio configuration files.
 
-#### a. Create the Alluxio Enterprise 3.x properties file
+#### a. Create the Alluxio AI Enterprise Edition properties file
 
 Alluxio uses a file to configure the deployment. Since this deployment is going to use a local MinIO instance as the persistent under store, and will use a local RAM disk as the cache medium, we will setup the Alluxio properties file using this command:
 
@@ -106,7 +106,7 @@ Alluxio uses a file to configure the deployment. Since this deployment is going 
 cat << EOF > config-files/alluxio/alluxio-site.properties
 # FILE: alluxio-site.properties
 #
-# DESC: This is the main Alluxio Enterprise 3.x properties file and should
+# DESC: This is the main Alluxio AI Enterprise Edition properties file and should
 #       be placed in:
 #          /opt/alluxio/conf/alluxio-site.properties
 #
@@ -191,19 +191,19 @@ sink.prometheus.class=alluxio.metrics.sink.PrometheusMetricsServlet
 EOF
 ```
 
-### Step 5. Build a custom Alluxio Enterprise 3.x docker image
+### Step 5. Build a custom Alluxio docker image
 
-Alluxio Enterprise can run with multiple masters and with multiple workers. In this non-production implementation, we will only have a single master node and a single worker node.
+Alluxio AI Enterprise Edition can run with multiple masters and with multiple workers. In this non-production implementation, we will only have a single master node and a single worker node.
 
 #### a. Create the Dockerfile build spec file
 
-To build a new Docker image file, the Docker build utility requires a specification file named "Dockerfile".  Create this file and include the steps needed to copy the Alluxio Enterprise installation files and configuration files into the Docker image. For this deployment, create the Dockerfile with these commands:
+To build a new Docker image file, the Docker build utility requires a specification file named "Dockerfile".  Create this file and include the steps needed to copy the Alluxio installation files and configuration files into the Docker image. For this deployment, create the Dockerfile with these commands:
 
 ```
 cat <<EOF > Dockerfile
 # FILE:  Dockerfile
 #
-# DESCR: Creates Alluxio Enterprise 3.x image 
+# DESCR: Creates Alluxio AI Enterprise Edition image 
 #
 # USAGE: docker build -t myalluxio/alluxio-enterprise:3.2.0-beta . 2>&1 | tee  ./build-log.txt
 #    OR: docker build --no-cache -t myalluxio/alluxio-enterprise:3.2.0-beta . 2>&1 | tee  ./build-log.txt
@@ -255,9 +255,9 @@ RUN if [ ! -d /usr/lib/jvm/jre-11-openjdk ]; then \
     fi 
 
 #
-# Install Alluxio Enterprise
+# Install Alluxio Enterprise Edition
 #
-# NOTE: You must first download the Alluxio Enterprise tar.gz file
+# NOTE: You must first download the Alluxio tar.gz file
 #       and place it in the ./local-files directory
 
 # Create an alluxio user (to run the Alluxio daemons)
@@ -301,7 +301,7 @@ Build the Docker image using the "docker build" command:
 
 #### c. (Optional) Upload image to a Docker image registry
 
-If you intend to deploy Alluxio Enterprise 3.x on a Kubernetes cluster, then you will have to upload the Docker image to a repository that can respond to a "docker pull" request. Usually the repository is hosted inside of your network firewall with products such as Artifactory, JFrog or a self hosted Docker registry.
+If you intend to deploy Alluxio AI Enterprise Edition on a Kubernetes cluster, then you will have to upload the Docker image to a repository that can respond to a "docker pull" request. Usually the repository is hosted inside of your network firewall with products such as Artifactory, JFrog or a self hosted Docker registry.
 
 If you are using DockerHub as your docker registry, Use the "docker push" command to upload the image, like this:
 
@@ -315,7 +315,7 @@ If you are using DockerHub as your docker registry, Use the "docker push" comman
 
 ### Step 6. Launch the docker containers with Docker Compose
 
-In this simple non-prod deployment, we will be using the Docker Compose utility to launch Alluxio Enterprise 3.x with the newly built Alluxio Docker image. Later, if you intend to launch the Alluxio Enterprise Docker image on a Kubernetes cluster, then you would follow the instructions provided Alluxio here:
+In this simple non-prod deployment, we will be using the Docker Compose utility to launch Alluxio with the newly built Alluxio Docker image. Later, if you intend to launch the Alluxio Docker image on a Kubernetes cluster, then you would follow the instructions provided Alluxio here:
 
     https://docs.alluxio.io/ee-ai/user/stable/en/kubernetes/Install-Alluxio-On-Kubernetes.html
 
@@ -356,7 +356,7 @@ Run the following command to launch a shell session in the worker container:
 
     docker exec -it alluxio-worker-1-qvn bash
 
-### Step 8. Check the status of the Alluxio Enterprise cluster
+### Step 8. Check the status of the Alluxio cluster
 
 a. In the Alluxio master alluxio-master-1-qvn shell session window, run the command to check the status of the cluster, including information about the Alluxio master and the worker. Run the command:
 
@@ -408,7 +408,7 @@ If you want to see detailed log message from the Alluxio master node, you can ru
 
 ### Step 9. Load a test data set into the Alluxio cache
 
-For machine learning and training workloads, Alluxio Enterprise allows you to pre-load data from your training data sets into the Alluxio cache. For this non-prod example environment, a portion of the NYC taxi ride data set has been staged in the MinIO S3 bucket. View the NYC taxi ride data set using the Alluxio CLI command:
+For machine learning and training workloads, Alluxio allows you to pre-load data from your training data sets into the Alluxio cache. For this non-prod example environment, a portion of the NYC taxi ride data set has been staged in the MinIO S3 bucket. View the NYC taxi ride data set using the Alluxio CLI command:
 
     alluxio fs ls -R /data/nyc-taxi-csv
 
@@ -529,7 +529,7 @@ You can view the Ray dashboard by pointing your web browser to this address:
 
     http://localhost:8265
 
-### Step 11. Explore the Alluxio Enterprise 3.x Dashboard
+### Step 11. Explore the Alluxio AI Enterprise Edition Dashboard
 
 a. Display the Prometheus Web console
 
