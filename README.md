@@ -460,13 +460,13 @@ This will show the cache usage information like this:
 
 ### Step 10. Load data from the fsspec implementation on a Ray cluster node
 
-Use a Ray Docker image to start a Ray node with Python integration. Run the command:
+a. Use a Ray Docker image to start a Ray node with Python integration. Run the command:
 
      docker run --rm -it --name ray-qvn bitnami/ray:latest
 
 This will launch a Python session that you can use to access Alluxio Enterprise via the Ray node.
 
-Now, load the ray Python module if it is not already loaded. use the Python commands:
+b. Now, load the ray Python module if it is not already loaded. use the Python commands:
 
      >>> 
      import subprocess
@@ -481,7 +481,7 @@ Now, load the ray Python module if it is not already loaded. use the Python comm
      # Install the Alluxio fsspec Python module
      install("xxx")
 
-Then have Ray load the data set using Alluxio's fsspec implementation. Use the Python commands:
+c. Then have Ray load the data set using Alluxio's fsspec implementation. Use the Python commands:
 
      >>>
      import fsspec
